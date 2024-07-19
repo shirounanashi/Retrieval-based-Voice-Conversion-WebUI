@@ -623,26 +623,6 @@ def train_index(exp_dir1, version19):
     big_npy_idx = np.arange(big_npy.shape[0])
     np.random.shuffle(big_npy_idx)
     big_npy = big_npy[big_npy_idx]
-    if big_npy.shape[0] > 2e5:
-        infos.append("Trying doing kmeans %s shape to 10k centers." % big_npy.shape[0])
-        yield "\n".join(infos)
-        try:
-            big_npy = (
-                MiniBatchKMeans(
-                    n_clusters=10000,
-                    verbose=True,
-                    batch_size=256 * config.n_cpu,
-                    compute_labels=False,
-                    init="random",
-                )
-                .fit(big_npy)
-                .cluster_centers_
-            )
-        except:
-            info = traceback.format_exc()
-            logger.info(info)
-            infos.append(info)
-            yield "\n".join(infos)
 
     np.save("%s/total_fea.npy" % exp_dir, big_npy)
     n_ivf = min(int(16 * np.sqrt(big_npy.shape[0])), big_npy.shape[0] // 39)
